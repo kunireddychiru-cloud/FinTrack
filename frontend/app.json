@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "FinTrack",
+    "slug": "fintrack",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "web": {
+      "bundler": "metro"
+    },
+    "ios": {
+      "bundleIdentifier": "com.klu.fintrack"
+    },
+    "android": {
+      "package": "com.klu.fintrack"
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.svg",
+          "backgroundColor": "#4F46E5",
+          "dark": {
+            "image": "./assets/splash.svg",
+            "backgroundColor": "#1A1A1A"
+          }
+        }
+      ]
+    ]
+  }
+}

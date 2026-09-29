@@ -1,0 +1,28 @@
+# Environment variables and local secrets
+.env*
+!.env.example
+!.env.*.example
+
+# Private keys, certificates, and service credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*service-account*.json
+*serviceAccount*.json
+firebase-adminsdk*.json
+credentials*.json
+
+# Firebase app configuration can contain API keys
+google-services.json
+GoogleService-Info.plist
+.runtimeconfig.json
+firebase-debug.log
+.firebase/
+
+# Dependencies and generated output
+node_modules/
+.expo/
+dist/
+build/
+coverage/

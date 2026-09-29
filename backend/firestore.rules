@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+
+    function validTxn(d) {
+      return d.title is string && d.title.size() > 0 && d.title.size() <= 100
+        && d.amount is number && d.amount > 0 && d.amount < 100000000
+        && d.type in ['income', 'expense']
+        && d.category is string && d.category.size() <= 30
+        && d.date is timestamp;
+    }
+
+    match /users/{uid} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && (!('currency' in request.resource.data) || request.resource.data.currency in ['INR', 'USD', 'EUR', 'GBP'])
+        && (!('language' in request.resource.data) || request.resource.data.language in ['en', 'hi', 'te'])
+        && (!('displayName' in request.resource.data) || (request.resource.data.displayName is string && request.resource.data.displayName.size() > 0 && request.resource.data.displayName.size() <= 40))
+        && (!('phone' in request.resource.data) || (request.resource.data.phone is string && request.resource.data.phone.matches('^\\+[1-9][0-9]{7,14}$')))
+        && (!('countryCode' in request.resource.data) || (request.resource.data.countryCode is string && request.resource.data.countryCode.size() <= 5))
+        && (!('createdAt' in request.resource.data) || request.resource.data.createdAt is timestamp);
+
+      match /transactions/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validTxn(request.resource.data);
+      }
+
+      match /budgets/{cat} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.limit is number && request.resource.data.limit > 0;
+      }
+
+      match /savings/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.type in ['deposit', 'withdrawal']
+          && request.resource.data.amount is number 
+          && request.resource.data.amount > 0 
+          && request.resource.data.amount < 100000000 
+          && request.resource.data.date is timestamp;
+      }
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}
